@@ -1,13 +1,10 @@
 import http from 'node:http'
 
+const users = []
+
 const server = http.createServer((request, response) => {
 
     const { method, url } = request
-
-    // console.log(method, url)
-
-    const users = []
-
 
 
     if (method === 'GET' && url === '/users') {
@@ -20,11 +17,11 @@ const server = http.createServer((request, response) => {
 
         users.push({
             id: 1,
-            name: 'Rapha',
+            name: 'Raphaaa',
             email: 'raphateste@exemple.com',
         })
 
-        return response.writeHead(201).end() //status code de criação - 201
+        return response.writeHead(201).end('criação de usuário') //status code de criação - 201
 
     }
     // else 
@@ -38,7 +35,7 @@ const server = http.createServer((request, response) => {
         return response.end('Atualização de um recurso no backend')
     }
 
-    return response.writeHead(404).end('Not Found')
+    return response.writeHead(404).end('Not Founddd')
 })
 
 server.listen(3333)
