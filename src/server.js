@@ -2,9 +2,24 @@ import http from 'node:http'
 
 const users = []
 
-const server = http.createServer((request, response) => {
+const server = http.createServer(async (request, response) => {
 
     const { method, url } = request
+
+    const buffers = []
+
+    for await(const chunk of request) {
+        buffers.push(chunk)
+    }
+
+
+    try {
+        request.body = JSON.parse(Buffer.concat(buffers).toString()) 
+    } catch {
+        request.body = null
+    }
+
+    
 
 
     if (method === 'GET' && url === '/users') {
@@ -12,27 +27,19 @@ const server = http.createServer((request, response) => {
         .setHeader('Content-type', 'application/json')
         .end(JSON.stringify(users))
     }
-    // else 
+    
     if (method === 'POST' && url === '/users') {
+
+        const { name, email } = request.body
 
         users.push({
             id: 1,
-            name: 'Raphaaa',
-            email: 'raphateste@exemple.com',
+            name,
+            email,
         })
 
         return response.writeHead(201).end('criação de usuário') //status code de criação - 201
 
-    }
-    // else 
-    // else 
-
-    if (method === 'PATCH' && url === '/users') {
-        return response.end("Atualizaão específica no backend")
-    }
-
-    if (method === 'PUT' && url === '/users') {
-        return response.end('Atualização de um recurso no backend')
     }
 
     return response.writeHead(404).end('Not Founddd')
