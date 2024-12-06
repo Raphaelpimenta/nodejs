@@ -1,42 +1,26 @@
 import http from 'node:http'
+
 import { json } from './middlewares/json.js'
-import { Database } from './database.js'
-
-const database = new Database()
-
-const server = http.createServer(async (request, response) => {
-
-    const { method, url } = request
-
-    await json(request, response)
-
-    
+import { routes } from './routes.js'
 
 
-    if (method === 'GET' && url === '/users') {
-        const users = database.select('users')
+const server = http.createServer(async (req, res) => {
 
-        return response
-        .end(JSON.stringify(users))
-    }
-    
-    if (method === 'POST' && url === '/users') {
+    const { method, url } = req
 
-        const { name, email } = request.body
+    await json(req, res)
 
-        const user = {
-            id: 1,
-            name,
-            email,
-        }
+    const route = routes.find(route => {
+        return route.method === method && route.path === url
+    })
 
-        database.insert('users', user)
+    // console.log(route)
 
-        return response.writeHead(201).end('criação de usuário') //status code de criação - 201
-
+    if(route) {
+        return route.handler(req, res)
     }
 
-    return response.writeHead(404).end('Not Founddd')
+    return res.writeHead(404).end('Not Founddd')
 })
 
 server.listen(3333)
